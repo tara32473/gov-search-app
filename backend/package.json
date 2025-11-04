@@ -1,1 +1,15 @@
-{\n  "name": "gov-search-backend",\n  "version": "1.0.0",\n  "private": true,\n  "dependencies": {\n    "express": "^4.18.4",\n    "cors": "^2.8.5",\n    "sqlite3": "^5.1.2",\n    "jsonwebtoken": "^9.0.0",\n    "bcryptjs": "^2.4.3"\n  },\n  "scripts": {\n    "start": "node server.js"\n  }\n}
+{
+  "name": "gov-search-backend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "express": "^4.18.4",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.2",
+    "jsonwebtoken": "^9.0.0",
+    "bcryptjs": "^2.4.3"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
