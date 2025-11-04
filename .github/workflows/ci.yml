@@ -10,6 +10,8 @@ jobs:
   backend:
     name: Backend Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     defaults:
       run:
@@ -37,6 +39,8 @@ jobs:
   frontend:
     name: Frontend Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     defaults:
       run:
