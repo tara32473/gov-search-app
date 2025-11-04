@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend:
+    name: Backend Build
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Check server.js exists
+      run: test -f server.js
+    
+    - name: Verify package.json
+      run: node -e "require('./package.json')"
+
+  frontend:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./frontend
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check frontend directory
+      run: |
+        echo "Frontend directory exists"
+        ls -la
+    
+    - name: Verify frontend structure
+      run: |
+        if [ -f package.json ]; then
+          echo "Frontend has package.json, proceeding with build"
+          npm ci
+          npm run build
+        else
+          echo "Frontend does not have package.json yet, skipping build steps"
+          exit 0
+        fi
