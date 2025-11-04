@@ -98,7 +98,16 @@ async function pullFromGitHub(limit = 10) {
 
 // Parse command line arguments
 const args = process.argv.slice(2);
-const limit = args[0] ? parseInt(args[0]) : 10;
+let limit = 10;
+
+if (args[0]) {
+  const parsedLimit = parseInt(args[0], 10);
+  if (isNaN(parsedLimit) || parsedLimit <= 0) {
+    console.error('Error: Limit must be a positive number');
+    process.exit(1);
+  }
+  limit = parsedLimit;
+}
 
 // Execute the pull
 pullFromGitHub(limit);
