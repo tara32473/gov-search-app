@@ -1,0 +1,20 @@
+{
+  "name": "gov-search-app",
+  "version": "1.0.0",
+  "description": "A simple application to search and pull government data from GitHub",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "government",
+    "github",
+    "search"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^20.0.2"
+  }
+}
