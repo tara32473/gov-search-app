@@ -3,7 +3,7 @@
 # Deployment Test Script
 # This script helps test the deployment configurations locally
 
-set -e
+set -euo pipefail
 
 echo "🚀 Gov Search App - Deployment Test Script"
 echo "==========================================="

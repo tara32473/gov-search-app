@@ -39,16 +39,17 @@ jobs:
         SERVER_PID=$!
         sleep 3
         
-        # Test health
+        # Test health with generated credentials
+        RANDOM_USER="testuser_$(date +%s)"
         curl -f http://localhost:4000/api/register \
           -X POST \
           -H "Content-Type: application/json" \
-          -d '{"username":"testuser","password":"testpass"}' || exit 1
+          -d "{\"username\":\"$RANDOM_USER\",\"password\":\"testpass123\"}" || exit 1
         
         echo "✓ Server is healthy"
         kill $SERVER_PID
       env:
-        JWT_SECRET: test-secret-for-ci
+        JWT_SECRET: ${{ secrets.CI_JWT_SECRET || 'test-secret-for-ci-do-not-use-in-production' }}
         PORT: 4000
 
   docker-build:
@@ -64,8 +65,9 @@ jobs:
     
     - name: Test Docker container
       run: |
+        RANDOM_USER="dockertest_$(date +%s)"
         docker run -d -p 4000:4000 \
-          -e JWT_SECRET=test-secret \
+          -e JWT_SECRET="${{ secrets.CI_JWT_SECRET || 'test-secret-for-ci-do-not-use-in-production' }}" \
           --name test-container \
           gov-search-backend:${{ github.sha }}
         
@@ -74,7 +76,7 @@ jobs:
         curl -f http://localhost:4000/api/register \
           -X POST \
           -H "Content-Type: application/json" \
-          -d '{"username":"dockertest","password":"testpass"}' || exit 1
+          -d "{\"username\":\"$RANDOM_USER\",\"password\":\"testpass123\"}" || exit 1
         
         echo "✓ Docker container is healthy"
         docker stop test-container

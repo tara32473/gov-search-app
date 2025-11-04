@@ -99,7 +99,10 @@ app.post('/api/admin/addcongress', (req, res) => {
 });
 
 // Only start server if not in serverless environment
-if (require.main === module) {
+// Check both require.main and explicit serverless environment variable
+const isServerless = process.env.SERVERLESS === 'true' || process.env.LAMBDA_TASK_ROOT || process.env.NETLIFY || process.env.VERCEL;
+
+if (!isServerless && require.main === module) {
     app.listen(PORT, () => console.log(`API listening on http://localhost:${PORT}`));
 }
 

@@ -13,7 +13,6 @@
     }
   ],
   "env": {
-    "JWT_SECRET": "@jwt_secret",
-    "PORT": "4000"
+    "JWT_SECRET": "@jwt_secret"
   }
 }
