@@ -1,0 +1,1 @@
+{\n  "name": "gov-search-backend",\n  "version": "1.0.0",\n  "private": true,\n  "dependencies": {\n    "express": "^4.18.4",\n    "cors": "^2.8.5",\n    "sqlite3": "^5.1.2",\n    "jsonwebtoken": "^9.0.0",\n    "bcryptjs": "^2.4.3"\n  },\n  "scripts": {\n    "start": "node server.js"\n  }\n}
