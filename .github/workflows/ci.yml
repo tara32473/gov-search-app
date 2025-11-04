@@ -55,7 +55,11 @@ jobs:
         if [ -f package.json ]; then
           echo "Frontend has package.json, proceeding with build"
           npm ci
-          npm run build
+          if npm run --silent 2>&1 | grep -q "build"; then
+            npm run build
+          else
+            echo "No build script found in package.json, skipping build"
+          fi
         else
           echo "Frontend does not have package.json yet, skipping build steps"
           exit 0
