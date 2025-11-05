@@ -1,0 +1,20 @@
+[dotenv@17.2.3] injecting env (10) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+🏛️  Government Watchdog API running on http://localhost:4000
+📊 API Endpoints:
+   GET  /api/health - Service status
+   POST /api/register - User registration
+   POST /api/login - User authentication
+   GET  /api/congress/members - Congressional members
+   GET  /api/legislation/bills - Bills and legislation
+   GET  /api/spending - Federal spending data
+   GET  /api/lobbying - Lobbying activities
+   GET  /api/dashboard/summary - Dashboard statistics
+🔍 Government Transparency & Accountability Platform
+🔄 Initializing sample government data...
+📡 Fetching congressional data...
+✅ Loaded 102 congressional members and executive officials
+💰 Fetching federal spending data...
+📋 Fetching recent legislation...
+🤝 Fetching lobbying data...
+✅ Loaded 35 lobbying records for 2025
+✅ Sample data loaded
