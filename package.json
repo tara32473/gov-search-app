@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "cd backend && node server.js",
-    "build": "./build.sh",
+    "build": "cd backend && npm install",
+    "install-backend": "cd backend && npm install",
     "test": "echo \"No tests yet!\" && exit 0",
     "backend": "cd backend && npm start",
     "backend:dev": "cd backend && npm run dev",
