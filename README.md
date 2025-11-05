@@ -213,4 +213,4 @@ For questions, feature requests, or bug reports:
 - 💬 [Discussions](https://github.com/tara32473/gov-search-app/discussions)
 - 📧 Email: watchdog@transparency.gov (demo)
 
-**🏛️ Democracy works best when government works in the open.**
+**🏛️ Democracy works best when government works in the open.**# Deployment fix Wed Nov  5 23:23:55 UTC 2025
