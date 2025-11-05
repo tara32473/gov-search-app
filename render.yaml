@@ -3,7 +3,7 @@ services:
     name: gov-search-app
     runtime: node
     buildCommand: cd backend && npm install
-    startCommand: cd backend && node server.js
+    startCommand: cd backend && node simple-server.js
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
