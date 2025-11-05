@@ -1,0 +1,18 @@
+{
+  "name": "gov-search-cli",
+  "version": "1.0.0",
+  "description": "CLI app to search government GitHub repositories by keyword",
+  "main": "index.js",
+  "bin": {
+    "govsearch": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"No tests yet!\" && exit 0"
+  },
+  "author": "tara32473",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^3.4.1"
+  }
+}
