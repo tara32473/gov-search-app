@@ -1,0 +1,16 @@
+[build]
+  base = "backend"
+  publish = "backend"
+  command = "npm install"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

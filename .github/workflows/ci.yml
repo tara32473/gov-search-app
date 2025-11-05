@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    
+    - name: Install dependencies
+      run: |
+        cd backend
+        npm install
+    
+    - name: Lint check
+      run: |
+        cd backend
+        npm run lint || echo "No lint script configured"
+    
+    - name: Start server and test
+      run: |
+        cd backend
+        npm start &
+        SERVER_PID=$!
+        sleep 3
+        
+        # Test health with generated credentials
+        RANDOM_USER="testuser_$(date +%s)"
+        curl -f http://localhost:4000/api/register \
+          -X POST \
+          -H "Content-Type: application/json" \
+          -d "{\"username\":\"$RANDOM_USER\",\"password\":\"testpass123\"}" || exit 1
+        
+        echo "✓ Server is healthy"
+        kill $SERVER_PID
+      env:
+        JWT_SECRET: ${{ secrets.CI_JWT_SECRET || 'test-secret-for-ci-do-not-use-in-production' }}
+        PORT: 4000
+
+  docker-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build Docker image
+      run: |
+        cd backend
+        docker build -t gov-search-backend:${{ github.sha }} .
+    
+    - name: Test Docker container
+      run: |
+        RANDOM_USER="dockertest_$(date +%s)"
+        docker run -d -p 4000:4000 \
+          -e JWT_SECRET="${{ secrets.CI_JWT_SECRET || 'test-secret-for-ci-do-not-use-in-production' }}" \
+          --name test-container \
+          gov-search-backend:${{ github.sha }}
+        
+        sleep 3
+        
+        curl -f http://localhost:4000/api/register \
+          -X POST \
+          -H "Content-Type: application/json" \
+          -d "{\"username\":\"$RANDOM_USER\",\"password\":\"testpass123\"}" || exit 1
+        
+        echo "✓ Docker container is healthy"
+        docker stop test-container

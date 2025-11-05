@@ -1,0 +1,26 @@
+{
+  "name": "gov-search-app",
+  "description": "Government search application with backend API",
+  "keywords": ["node", "express", "api", "government", "search"],
+  "repository": "https://github.com/tara32473/gov-search-app",
+  "logo": "",
+  "success_url": "/api/search",
+  "env": {
+    "JWT_SECRET": {
+      "description": "Secret key for JWT token generation and verification",
+      "generator": "secret",
+      "required": true
+    },
+    "PORT": {
+      "description": "Port number for the server",
+      "value": "4000",
+      "required": false
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "stack": "heroku-22"
+}
