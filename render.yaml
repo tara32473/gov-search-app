@@ -1,20 +1,11 @@
-# Render.com Deployment Configuration
-# This file tells Render how to build and run your app
-
-# Build Command (run during deployment)
-buildCommand: cd backend && npm install
-
-# Start Command (run to start your app)
-startCommand: cd backend && node server.js
-
-# Environment
-env: node
-
-# Node Version
-nodeVersion: 18
-
-# Health Check Path
-healthCheckPath: /api/health
-
-# Auto-Deploy
-autoDeploy: true
+services:
+  - type: web
+    name: gov-search-app
+    runtime: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node server.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
