@@ -1,18 +1,32 @@
 {
-  "name": "gov-search-cli",
-  "version": "1.0.0",
-  "description": "CLI app to search government GitHub repositories by keyword",
+  "name": "government-watchdog-app",
+  "version": "2.0.0",
+  "description": "Government transparency and accountability platform - track Congress, spending, legislation, and lobbying",
   "main": "index.js",
   "bin": {
-    "govsearch": "./index.js"
+    "govwatch": "./index.js"
   },
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"No tests yet!\" && exit 0"
+    "start": "cd backend && node server.js",
+    "build": "./build.sh",
+    "test": "echo \"No tests yet!\" && exit 0",
+    "backend": "cd backend && npm start",
+    "backend:dev": "cd backend && npm run dev",
+    "cli": "node index.js",
+    "setup": "npm install && cd backend && npm install",
+    "dev": "concurrently \"npm run backend:dev\" \"echo 'Backend running on http://localhost:4000'\"",
+    "help": "echo 'Available commands: npm run cli <keyword> [limit], npm run backend, npm run dev'"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
   },
   "author": "tara32473",
   "license": "MIT",
   "dependencies": {
-    "node-fetch": "^3.4.1"
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
