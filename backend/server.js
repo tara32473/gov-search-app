@@ -3254,6 +3254,16 @@ setTimeout(async () => {
     console.log('✅ Sample data loaded');
 }, 1000);
 
+// Root route for basic connectivity test
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'Government Watchdog API is running',
+        status: 'ok',
+        version: '1.0.0',
+        endpoints: ['/api/health', '/api/congress/members', '/api/spending', '/api/lobbying', '/api/legislation/bills']
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`🏛️  Government Watchdog API running on http://localhost:${PORT}`);
     console.log(`📊 API Endpoints:`);
