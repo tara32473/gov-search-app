@@ -33,8 +33,10 @@
     "test": "jest",
     "migrate": "node scripts/migrate.js",
     "seed": "node scripts/seed.js",
-    "build": "echo 'Backend build complete'",
-    "health": "node healthcheck.js"
+    "build": "echo 'Backend build complete - Node.js $(node --version)'",
+    "health": "node healthcheck.js",
+    "prestart": "node -e \"console.log('🚀 Starting Government Search App Backend v2025.1.0')\"",
+    "postinstall": "echo 'Dependencies installed successfully'"
   },
   "engines": {
     "node": ">=18.0.0",

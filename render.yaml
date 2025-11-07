@@ -1,9 +1,18 @@
 services:
   - type: web
-    name: gov-search-app
-    runtime: node
-    buildCommand: npm install
-    startCommand: node server.js
+    name: gov-search-app-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 4000
+      - key: DATABASE_URL
+        value: file:./database.sqlite
+      - key: JWT_SECRET
+        generateValue: true
+      - key: API_KEY
+        generateValue: true
+    healthCheckPath: /api/health

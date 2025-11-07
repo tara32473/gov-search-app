@@ -137,7 +137,8 @@ function validateLimit(limit) {
 }
 
 // Database setup for government watchdog data
-const db = new sqlite3.Database('./watchdog.sqlite');
+const dbPath = process.env.DATABASE_URL || './watchdog.sqlite';
+const db = new sqlite3.Database(dbPath);
 db.serialize(() => {
     // Users and authentication
     db.run(`CREATE TABLE IF NOT EXISTS users (
