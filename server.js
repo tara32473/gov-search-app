@@ -4,7 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Serve static files (HTML frontend)
-app.use(express.static('.'));
+app.use(express.static(__dirname));
 
 // Root route - serve the main HTML page
 app.get('/', (req, res) => {
