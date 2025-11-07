@@ -180,10 +180,62 @@
                 <div class="search-card">
                     <h3><span class="icon">💰</span> Federal Spending</h3>
                     <p>Track government expenditures and contracts</p>
-                    <div style="display: flex; gap: 0.5rem; align-items: center;">
-                        <input type="text" class="search-input" id="spending-search" placeholder="Enter agency, recipient, or keyword...">
-                        <input type="text" class="search-input" id="spending-state" placeholder="State (e.g., CA or California)" style="width: 180px;">
-                        <button class="search-btn" onclick="searchSpending()">Search Spending</button>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 0.5rem; align-items: center; margin-bottom: 1rem;">
+                        <input type="text" class="search-input" id="spending-search" placeholder="Enter agency, recipient, or keyword..." style="margin-bottom: 0;">
+                        <select class="search-input" id="spending-state" style="margin-bottom: 0;">
+                            <option value="">All States</option>
+                            <option value="alabama">Alabama</option>
+                            <option value="alaska">Alaska</option>
+                            <option value="arizona">Arizona</option>
+                            <option value="arkansas">Arkansas</option>
+                            <option value="california">California</option>
+                            <option value="colorado">Colorado</option>
+                            <option value="connecticut">Connecticut</option>
+                            <option value="delaware">Delaware</option>
+                            <option value="florida">Florida</option>
+                            <option value="georgia">Georgia</option>
+                            <option value="hawaii">Hawaii</option>
+                            <option value="idaho">Idaho</option>
+                            <option value="illinois">Illinois</option>
+                            <option value="indiana">Indiana</option>
+                            <option value="iowa">Iowa</option>
+                            <option value="kansas">Kansas</option>
+                            <option value="kentucky">Kentucky</option>
+                            <option value="louisiana">Louisiana</option>
+                            <option value="maine">Maine</option>
+                            <option value="maryland">Maryland</option>
+                            <option value="massachusetts">Massachusetts</option>
+                            <option value="michigan">Michigan</option>
+                            <option value="minnesota">Minnesota</option>
+                            <option value="mississippi">Mississippi</option>
+                            <option value="missouri">Missouri</option>
+                            <option value="montana">Montana</option>
+                            <option value="nebraska">Nebraska</option>
+                            <option value="nevada">Nevada</option>
+                            <option value="new hampshire">New Hampshire</option>
+                            <option value="new jersey">New Jersey</option>
+                            <option value="new mexico">New Mexico</option>
+                            <option value="new york">New York</option>
+                            <option value="north carolina">North Carolina</option>
+                            <option value="north dakota">North Dakota</option>
+                            <option value="ohio">Ohio</option>
+                            <option value="oklahoma">Oklahoma</option>
+                            <option value="oregon">Oregon</option>
+                            <option value="pennsylvania">Pennsylvania</option>
+                            <option value="rhode island">Rhode Island</option>
+                            <option value="south carolina">South Carolina</option>
+                            <option value="south dakota">South Dakota</option>
+                            <option value="tennessee">Tennessee</option>
+                            <option value="texas">Texas</option>
+                            <option value="utah">Utah</option>
+                            <option value="vermont">Vermont</option>
+                            <option value="virginia">Virginia</option>
+                            <option value="washington">Washington</option>
+                            <option value="west virginia">West Virginia</option>
+                            <option value="wisconsin">Wisconsin</option>
+                            <option value="wyoming">Wyoming</option>
+                        </select>
+                        <button class="search-btn" onclick="searchSpending()" style="width: auto; padding: 0.75rem 1rem;">Search Spending</button>
                     </div>
                     <div id="spending-results" class="results"></div>
                 </div>
@@ -403,7 +455,18 @@
             resultsDiv.innerHTML = '<div class="loading">🔍 Searching spending...</div>';
 
             try {
-                const endpoint = `${API_BASE}/api/spending?limit=200`;
+                // Build URL with server-side filtering
+                const params = new URLSearchParams();
+                params.append('limit', '100');
+                
+                if (keyword && keyword.trim()) {
+                    params.append('keyword', keyword.trim());
+                }
+                if (stateFilter && stateFilter.trim()) {
+                    params.append('state', stateFilter.trim());
+                }
+                
+                const endpoint = `${API_BASE}/api/spending?${params.toString()}`;
                 const response = await fetch(endpoint);
                 const data = await response.json();
 
@@ -416,53 +479,16 @@
                     results = [results];
                 }
 
-                // State abbreviation mapping
-                const stateMap = {
-                    'al': 'alabama', 'ak': 'alaska', 'az': 'arizona', 'ar': 'arkansas', 'ca': 'california',
-                    'co': 'colorado', 'ct': 'connecticut', 'de': 'delaware', 'fl': 'florida', 'ga': 'georgia',
-                    'hi': 'hawaii', 'id': 'idaho', 'il': 'illinois', 'in': 'indiana', 'ia': 'iowa',
-                    'ks': 'kansas', 'ky': 'kentucky', 'la': 'louisiana', 'me': 'maine', 'md': 'maryland',
-                    'ma': 'massachusetts', 'mi': 'michigan', 'mn': 'minnesota', 'ms': 'mississippi', 'mo': 'missouri',
-                    'mt': 'montana', 'ne': 'nebraska', 'nv': 'nevada', 'nh': 'new hampshire', 'nj': 'new jersey',
-                    'nm': 'new mexico', 'ny': 'new york', 'nc': 'north carolina', 'nd': 'north dakota', 'oh': 'ohio',
-                    'ok': 'oklahoma', 'or': 'oregon', 'pa': 'pennsylvania', 'ri': 'rhode island', 'sc': 'south carolina',
-                    'sd': 'south dakota', 'tn': 'tennessee', 'tx': 'texas', 'ut': 'utah', 'vt': 'vermont',
-                    'va': 'virginia', 'wa': 'washington', 'wv': 'west virginia', 'wi': 'wisconsin', 'wy': 'wyoming'
-                };
-
-                // Apply state filter (matches recipient_name, award_description, place_of_performance)
-                const sf = (stateFilter || '').toLowerCase().trim();
-                let expanded = '';
-                if (sf) {
-                    expanded = stateMap[sf] || sf; // if abbreviation provided, expand to full name; otherwise assume full name
-                    results = results.filter(item => {
-                        const recip = (item.recipient_name || '').toLowerCase();
-                        const desc = (item.award_description || '').toLowerCase();
-                        const place = (item.place_of_performance || '').toLowerCase();
-
-                        return (recip && (recip.includes(sf) || recip.includes(expanded))) ||
-                               (desc && (desc.includes(sf) || desc.includes(expanded))) ||
-                               (place && (place.includes(sf) || place.includes(expanded)));
-                    });
-                }
-
-                // Apply keyword search if provided
-                if (keyword && keyword.trim()) {
-                    const q = keyword.toLowerCase().trim();
-                    results = results.filter(item => {
-                        const searchable = `${item.recipient_name || ''} ${item.award_description || ''} ${item.awarding_agency || ''}`.toLowerCase();
-                        return searchable.includes(q) || (item.award_id && item.award_id.toLowerCase().includes(q));
-                    });
-                }
-
                 if (results.length === 0) {
-                    resultsDiv.innerHTML = '<div class="result-item">No spending records found. Try a different search or clear the state filter.</div>';
+                    resultsDiv.innerHTML = '<div class="result-item">No spending records found. Try a different search or clear filters.</div>';
                     return;
                 }
 
                 resultsDiv.innerHTML = `
                     <div style="margin-bottom: 1rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; font-size: 0.9rem;">
                         Found ${results.length} spending record${results.length !== 1 ? 's' : ''}
+                        ${stateFilter ? ` in ${stateFilter}` : ''}
+                        ${keyword ? ` matching "${keyword}"` : ''}
                     </div>
                     ${results.slice(0, 20).map(item => formatResult(item, 'spending-results')).join('')}
                 `;
@@ -492,13 +518,27 @@
             resultsDiv.innerHTML = '<div class="loading">🔍 Searching legislation...</div>';
 
             try {
-                // Build endpoint with filters
-                let endpoint = `${API_BASE}/api/legislation/bills?limit=100`;
+                // Build endpoint with server-side filtering
+                const params = new URLSearchParams();
+                params.append('limit', '100');
                 
+                if (keyword && keyword.trim()) {
+                    params.append('keyword', keyword.trim());
+                }
                 if (congressFilter) {
-                    endpoint += `&congress=${congressFilter}`;
+                    params.append('congress', congressFilter);
                 }
                 
+                // Handle bill type and status filters
+                if (billTypeFilter) {
+                    if (billTypeFilter === 'hr' || billTypeFilter === 's') {
+                        params.append('bill_type', billTypeFilter);
+                    } else if (['introduced', 'passed', 'enacted'].includes(billTypeFilter)) {
+                        params.append('status', billTypeFilter);
+                    }
+                }
+                
+                const endpoint = `${API_BASE}/api/legislation/bills?${params.toString()}`;
                 const response = await fetch(endpoint);
                 const data = await response.json();
 
@@ -511,28 +551,6 @@
                     results = [results];
                 }
 
-                // Client-side filtering for bill type and status
-                if (billTypeFilter) {
-                    if (billTypeFilter === 'hr' || billTypeFilter === 's') {
-                        results = results.filter(item => item.bill_type && item.bill_type.toLowerCase() === billTypeFilter);
-                    } else if (['introduced', 'passed', 'enacted'].includes(billTypeFilter)) {
-                        results = results.filter(item => item.status && item.status.toLowerCase() === billTypeFilter);
-                    }
-                }
-
-                // Text search filtering
-                if (keyword) {
-                    const searchTerm = keyword.toLowerCase().trim();
-                    results = results.filter(item => {
-                        const searchableText = JSON.stringify(item).toLowerCase();
-                        return searchableText.includes(searchTerm) ||
-                               (item.title && item.title.toLowerCase().includes(searchTerm)) ||
-                               (item.summary && item.summary.toLowerCase().includes(searchTerm)) ||
-                               (item.sponsor && item.sponsor.toLowerCase().includes(searchTerm)) ||
-                               (item.bill_id && item.bill_id.toLowerCase().includes(searchTerm));
-                    });
-                }
-
                 if (results.length === 0) {
                     resultsDiv.innerHTML = '<div class="result-item">No bills found matching your criteria. Try adjusting your filters or search terms.</div>';
                     return;
@@ -540,7 +558,11 @@
 
                 resultsDiv.innerHTML = `
                     <div style="margin-bottom: 1rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; font-size: 0.9rem;">
-                        Found ${results.length} bill${results.length !== 1 ? 's' : ''} matching your criteria
+                        Found ${results.length} bill${results.length !== 1 ? 's' : ''} 
+                        ${congressFilter ? `from ${congressFilter}th Congress` : ''}
+                        ${billTypeFilter && ['hr', 's'].includes(billTypeFilter) ? `(${billTypeFilter.toUpperCase()} bills)` : ''}
+                        ${billTypeFilter && ['introduced', 'passed', 'enacted'].includes(billTypeFilter) ? `with status: ${billTypeFilter}` : ''}
+                        ${keyword ? `matching "${keyword}"` : ''}
                     </div>
                     ${results.slice(0, 20).map(item => formatResult(item, 'legislation-results')).join('')}
                 `;

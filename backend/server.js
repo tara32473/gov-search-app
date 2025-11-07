@@ -3096,7 +3096,7 @@ app.get('/api/congress/members', async (req, res) => {
 
 // Recent bills and legislation
 app.get('/api/legislation/bills', (req, res) => {
-    const { status, subject, sponsor, limit = 50 } = req.query;
+    const { status, subject, sponsor, bill_type, congress, keyword, limit = 50 } = req.query;
     let query = 'SELECT * FROM bills WHERE 1=1';
     let params = [];
     
@@ -3112,6 +3112,19 @@ app.get('/api/legislation/bills', (req, res) => {
         query += ' AND sponsor_id = ?';
         params.push(sponsor);
     }
+    if (bill_type) {
+        query += ' AND bill_type = ?';
+        params.push(bill_type.toLowerCase());
+    }
+    if (congress) {
+        query += ' AND congress = ?';
+        params.push(parseInt(congress));
+    }
+    if (keyword) {
+        query += ' AND (title LIKE ? OR summary LIKE ? OR bill_id LIKE ? OR subjects LIKE ?)';
+        const keywordPattern = `%${keyword}%`;
+        params.push(keywordPattern, keywordPattern, keywordPattern, keywordPattern);
+    }
     
     query += ' ORDER BY introduced_date DESC LIMIT ?';
     params.push(parseInt(limit));
@@ -3124,7 +3137,7 @@ app.get('/api/legislation/bills', (req, res) => {
 
 // Federal spending search
 app.get('/api/spending', (req, res) => {
-    const { agency, recipient, min_amount, fiscal_year, limit = 100 } = req.query;
+    const { agency, recipient, min_amount, fiscal_year, state, keyword, limit = 100 } = req.query;
     let query = 'SELECT * FROM federal_spending WHERE 1=1';
     let params = [];
     
@@ -3143,6 +3156,16 @@ app.get('/api/spending', (req, res) => {
     if (fiscal_year) {
         query += ' AND fiscal_year = ?';
         params.push(parseInt(fiscal_year));
+    }
+    if (state) {
+        query += ' AND (recipient_name LIKE ? OR award_description LIKE ? OR place_of_performance LIKE ?)';
+        const statePattern = `%${state}%`;
+        params.push(statePattern, statePattern, statePattern);
+    }
+    if (keyword) {
+        query += ' AND (recipient_name LIKE ? OR award_description LIKE ? OR awarding_agency LIKE ? OR award_id LIKE ?)';
+        const keywordPattern = `%${keyword}%`;
+        params.push(keywordPattern, keywordPattern, keywordPattern, keywordPattern);
     }
     
     query += ' ORDER BY award_amount DESC LIMIT ?';
