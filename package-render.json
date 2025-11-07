@@ -1,0 +1,16 @@
+{
+  "name": "government-watchdog-app",
+  "version": "2.0.0",
+  "description": "Government transparency and accountability platform - track Congress, spending, legislation, and lobbying",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "cd backend && node server.js",
+    "build": "cd backend && npm install",
+    "postinstall": "cd backend && npm install"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "author": "tara32473",
+  "license": "MIT"
+}
