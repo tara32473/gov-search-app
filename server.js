@@ -1,21 +1,34 @@
 const express = require('express');
+const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 
+// Serve static files (HTML frontend)
+app.use(express.static('.'));
+
+// Root route - serve the main HTML page
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
   res.json({
-    message: "Government Watchdog API",
-    status: "running",
-    timestamp: new Date().toISOString()
+    message: 'Government Watchdog API is running',
+    status: 'ok',
+    version: '1.0.0',
+    endpoints: [
+      '/api/health',
+      '/api/congress/members',
+      '/api/spending',
+      '/api/lobbying',
+      '/api/legislation/bills'
+    ]
   });
 });
 
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: "ok",
-    service: "government-watchdog-api",
-    version: "1.0.0"
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
 app.listen(PORT, () => {
