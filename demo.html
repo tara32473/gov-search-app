@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Government Watchdog - Transparency Tools</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .endpoint { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        button { background: #007cba; color: white; border: none; padding: 10px 15px; cursor: pointer; }
+        .results { background: #e8f4f8; padding: 10px; margin-top: 10px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🏛️ Government Watchdog API</h1>
+    <p>Access comprehensive government transparency data</p>
+    
+    <div class="endpoint">
+        <h3>Congress Members</h3>
+        <button onclick="fetchData('/api/congress/members?limit=5')">Get Representatives</button>
+        <div id="congress" class="results"></div>
+    </div>
+
+    <div class="endpoint">
+        <h3>Federal Spending</h3>
+        <button onclick="fetchData('/api/spending?limit=5')">View Spending</button>
+        <div id="spending" class="results"></div>
+    </div>
+
+    <div class="endpoint">
+        <h3>Lobbying Activity</h3>
+        <button onclick="fetchData('/api/lobbying?limit=5')">Check Lobbying</button>
+        <div id="lobbying" class="results"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://gov-search-app-production.up.railway.app';
+        
+        async function fetchData(endpoint) {
+            try {
+                const response = await fetch(API_BASE + endpoint);
+                const data = await response.json();
+                const targetId = endpoint.split('/')[2].split('?')[0];
+                document.getElementById(targetId).innerHTML = 
+                    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
