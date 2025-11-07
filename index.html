@@ -180,8 +180,11 @@
                 <div class="search-card">
                     <h3><span class="icon">💰</span> Federal Spending</h3>
                     <p>Track government expenditures and contracts</p>
-                    <input type="text" class="search-input" id="spending-search" placeholder="Enter agency, recipient, or keyword...">
-                    <button class="search-btn" onclick="searchSpending()">Search Spending</button>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="text" class="search-input" id="spending-search" placeholder="Enter agency, recipient, or keyword...">
+                        <input type="text" class="search-input" id="spending-state" placeholder="State (e.g., CA or California)" style="width: 180px;">
+                        <button class="search-btn" onclick="searchSpending()">Search Spending</button>
+                    </div>
                     <div id="spending-results" class="results"></div>
                 </div>
 
@@ -390,7 +393,83 @@
 
         function searchSpending() {
             const keyword = document.getElementById('spending-search').value;
-            searchAPI('/api/spending', 'spending-results', keyword);
+            const stateFilter = document.getElementById('spending-state') ? document.getElementById('spending-state').value : '';
+            searchSpendingWithFilters(keyword, stateFilter);
+        }
+
+        async function searchSpendingWithFilters(keyword = '', stateFilter = '') {
+            const resultsDiv = document.getElementById('spending-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="loading">🔍 Searching spending...</div>';
+
+            try {
+                const endpoint = `${API_BASE}/api/spending?limit=200`;
+                const response = await fetch(endpoint);
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                let results = data.data || data;
+                if (!Array.isArray(results)) {
+                    results = [results];
+                }
+
+                // State abbreviation mapping
+                const stateMap = {
+                    'al': 'alabama', 'ak': 'alaska', 'az': 'arizona', 'ar': 'arkansas', 'ca': 'california',
+                    'co': 'colorado', 'ct': 'connecticut', 'de': 'delaware', 'fl': 'florida', 'ga': 'georgia',
+                    'hi': 'hawaii', 'id': 'idaho', 'il': 'illinois', 'in': 'indiana', 'ia': 'iowa',
+                    'ks': 'kansas', 'ky': 'kentucky', 'la': 'louisiana', 'me': 'maine', 'md': 'maryland',
+                    'ma': 'massachusetts', 'mi': 'michigan', 'mn': 'minnesota', 'ms': 'mississippi', 'mo': 'missouri',
+                    'mt': 'montana', 'ne': 'nebraska', 'nv': 'nevada', 'nh': 'new hampshire', 'nj': 'new jersey',
+                    'nm': 'new mexico', 'ny': 'new york', 'nc': 'north carolina', 'nd': 'north dakota', 'oh': 'ohio',
+                    'ok': 'oklahoma', 'or': 'oregon', 'pa': 'pennsylvania', 'ri': 'rhode island', 'sc': 'south carolina',
+                    'sd': 'south dakota', 'tn': 'tennessee', 'tx': 'texas', 'ut': 'utah', 'vt': 'vermont',
+                    'va': 'virginia', 'wa': 'washington', 'wv': 'west virginia', 'wi': 'wisconsin', 'wy': 'wyoming'
+                };
+
+                // Apply state filter (matches recipient_name, award_description, place_of_performance)
+                const sf = (stateFilter || '').toLowerCase().trim();
+                let expanded = '';
+                if (sf) {
+                    expanded = stateMap[sf] || sf; // if abbreviation provided, expand to full name; otherwise assume full name
+                    results = results.filter(item => {
+                        const recip = (item.recipient_name || '').toLowerCase();
+                        const desc = (item.award_description || '').toLowerCase();
+                        const place = (item.place_of_performance || '').toLowerCase();
+
+                        return (recip && (recip.includes(sf) || recip.includes(expanded))) ||
+                               (desc && (desc.includes(sf) || desc.includes(expanded))) ||
+                               (place && (place.includes(sf) || place.includes(expanded)));
+                    });
+                }
+
+                // Apply keyword search if provided
+                if (keyword && keyword.trim()) {
+                    const q = keyword.toLowerCase().trim();
+                    results = results.filter(item => {
+                        const searchable = `${item.recipient_name || ''} ${item.award_description || ''} ${item.awarding_agency || ''}`.toLowerCase();
+                        return searchable.includes(q) || (item.award_id && item.award_id.toLowerCase().includes(q));
+                    });
+                }
+
+                if (results.length === 0) {
+                    resultsDiv.innerHTML = '<div class="result-item">No spending records found. Try a different search or clear the state filter.</div>';
+                    return;
+                }
+
+                resultsDiv.innerHTML = `
+                    <div style="margin-bottom: 1rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; font-size: 0.9rem;">
+                        Found ${results.length} spending record${results.length !== 1 ? 's' : ''}
+                    </div>
+                    ${results.slice(0, 20).map(item => formatResult(item, 'spending-results')).join('')}
+                `;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
         }
 
         function searchLobbying() {
