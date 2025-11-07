@@ -3,7 +3,7 @@ services:
     name: gov-search-app
     runtime: node
     buildCommand: npm install
-    startCommand: node app.js
+    startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production

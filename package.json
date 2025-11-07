@@ -2,7 +2,7 @@
   "name": "government-watchdog-app",
   "version": "2.0.0",
   "description": "Government transparency and accountability platform - track Congress, spending, legislation, and lobbying",
-  "main": "app.js",
+  "main": "server.js",
   "bin": {
     "govwatch": "./index.js"
   },
