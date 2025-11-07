@@ -1,0 +1,50 @@
+{
+  "name": "government-watchdog-app",
+  "version": "2.0.0",
+  "description": "Government transparency and accountability platform - track Congress, spending, legislation, and lobbying",
+  "main": "server.js",
+  "bin": {
+    "govwatch": "./index.js"
+  },
+  "scripts": {
+    "start": "cd backend && node server.js",
+    "build": "cd backend && npm install",
+    "install-backend": "cd backend && npm install",
+    "test": "echo \"No tests yet!\" && exit 0",
+    "backend": "cd backend && npm start",
+    "backend:dev": "cd backend && npm run dev",
+    "cli": "node index.js",
+    "setup": "npm install && cd backend && npm install",
+    "dev": "concurrently \"npm run backend:dev\" \"echo 'Backend running on http://localhost:4000'\"",
+    "help": "echo 'Available commands: npm run cli <keyword> [limit], npm run backend, npm run dev'"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  },
+  "author": "tara32473",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "axios": "^1.6.0",
+    "bcryptjs": "^2.4.3",
+    "cheerio": "^1.0.0-rc.12",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "ioredis": "^5.8.2",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.1",
+    "pg": "^8.16.3",
+    "sqlite3": "^5.1.6",
+    "winston": "^3.18.3",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
