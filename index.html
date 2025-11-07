@@ -172,7 +172,7 @@
                 <div class="search-card">
                     <h3><span class="icon">👥</span> Congress Members</h3>
                     <p>Search for representatives and senators</p>
-                    <input type="text" class="search-input" id="congress-search" placeholder="Enter name, state, or party...">
+                    <input type="text" class="search-input" id="congress-search" placeholder="Enter name, state (e.g., CA, TX), or party...">
                     <button class="search-btn" onclick="searchCongress()">Search Congress</button>
                     <div id="congress-results" class="results"></div>
                 </div>
@@ -180,7 +180,7 @@
                 <div class="search-card">
                     <h3><span class="icon">💰</span> Federal Spending</h3>
                     <p>Track government expenditures and contracts</p>
-                    <input type="text" class="search-input" id="spending-search" placeholder="Enter agency, recipient, or amount...">
+                    <input type="text" class="search-input" id="spending-search" placeholder="Enter agency, recipient, or keyword...">
                     <button class="search-btn" onclick="searchSpending()">Search Spending</button>
                     <div id="spending-results" class="results"></div>
                 </div>
@@ -188,7 +188,7 @@
                 <div class="search-card">
                     <h3><span class="icon">🤝</span> Lobbying Activity</h3>
                     <p>Monitor lobbying efforts and influence</p>
-                    <input type="text" class="search-input" id="lobbying-search" placeholder="Enter client, lobbyist, or issue...">
+                    <input type="text" class="search-input" id="lobbying-search" placeholder="Enter client, lobbyist, or issue (e.g., healthcare)...">
                     <button class="search-btn" onclick="searchLobbying()">Search Lobbying</button>
                     <div id="lobbying-results" class="results"></div>
                 </div>
@@ -196,7 +196,7 @@
                 <div class="search-card">
                     <h3><span class="icon">📋</span> Legislation</h3>
                     <p>Follow bills and voting records</p>
-                    <input type="text" class="search-input" id="legislation-search" placeholder="Enter bill title, number, or topic...">
+                    <input type="text" class="search-input" id="legislation-search" placeholder="Enter bill title, sponsor, or topic...">
                     <button class="search-btn" onclick="searchLegislation()">Search Bills</button>
                     <div id="legislation-results" class="results"></div>
                 </div>
@@ -218,23 +218,60 @@
             resultsDiv.innerHTML = '<div class="loading">🔍 Searching...</div>';
 
             try {
-                const url = keyword ? 
-                    `${API_BASE}${endpoint}?keyword=${encodeURIComponent(keyword)}&limit=10` : 
-                    `${API_BASE}${endpoint}?limit=10`;
-                
-                const response = await fetch(url);
+                // Get all data first (since API doesn't support keyword filtering yet)
+                const response = await fetch(`${API_BASE}${endpoint}?limit=50`);
                 const data = await response.json();
 
                 if (data.error) {
                     throw new Error(data.error);
                 }
 
-                if (!data.data || data.data.length === 0) {
-                    resultsDiv.innerHTML = '<div class="result-item">No results found. Try a different search term.</div>';
+                let results = data.data || data;
+                if (!Array.isArray(results)) {
+                    results = [results];
+                }
+
+                // Client-side filtering if keyword is provided
+                if (keyword) {
+                    const searchTerm = keyword.toLowerCase().trim();
+                    
+                    // State abbreviation mapping for Congress searches
+                    const stateMap = {
+                        'al': 'alabama', 'ak': 'alaska', 'az': 'arizona', 'ar': 'arkansas', 'ca': 'california',
+                        'co': 'colorado', 'ct': 'connecticut', 'de': 'delaware', 'fl': 'florida', 'ga': 'georgia',
+                        'hi': 'hawaii', 'id': 'idaho', 'il': 'illinois', 'in': 'indiana', 'ia': 'iowa',
+                        'ks': 'kansas', 'ky': 'kentucky', 'la': 'louisiana', 'me': 'maine', 'md': 'maryland',
+                        'ma': 'massachusetts', 'mi': 'michigan', 'mn': 'minnesota', 'ms': 'mississippi', 'mo': 'missouri',
+                        'mt': 'montana', 'ne': 'nebraska', 'nv': 'nevada', 'nh': 'new hampshire', 'nj': 'new jersey',
+                        'nm': 'new mexico', 'ny': 'new york', 'nc': 'north carolina', 'nd': 'north dakota', 'oh': 'ohio',
+                        'ok': 'oklahoma', 'or': 'oregon', 'pa': 'pennsylvania', 'ri': 'rhode island', 'sc': 'south carolina',
+                        'sd': 'south dakota', 'tn': 'tennessee', 'tx': 'texas', 'ut': 'utah', 'vt': 'vermont',
+                        'va': 'virginia', 'wa': 'washington', 'wv': 'west virginia', 'wi': 'wisconsin', 'wy': 'wyoming'
+                    };
+
+                    // Expand state abbreviation if found
+                    const expandedTerm = stateMap[searchTerm] || searchTerm;
+
+                    results = results.filter(item => {
+                        const searchableText = JSON.stringify(item).toLowerCase();
+                        return searchableText.includes(searchTerm) || 
+                               searchableText.includes(expandedTerm) ||
+                               (item.state && item.state.toLowerCase() === searchTerm) ||
+                               (item.first_name && item.first_name.toLowerCase().includes(searchTerm)) ||
+                               (item.last_name && item.last_name.toLowerCase().includes(searchTerm)) ||
+                               (item.party && item.party.toLowerCase().includes(searchTerm)) ||
+                               (item.client_name && item.client_name.toLowerCase().includes(searchTerm)) ||
+                               (item.agency && item.agency.toLowerCase().includes(searchTerm)) ||
+                               (item.recipient && item.recipient.toLowerCase().includes(searchTerm));
+                    });
+                }
+
+                if (results.length === 0) {
+                    resultsDiv.innerHTML = '<div class="result-item">No results found. Try a different search term or browse all results by leaving the search blank.</div>';
                     return;
                 }
 
-                resultsDiv.innerHTML = data.data.map(item => formatResult(item, resultsId)).join('');
+                resultsDiv.innerHTML = results.slice(0, 10).map(item => formatResult(item, resultsId)).join('');
                 
             } catch (error) {
                 resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
