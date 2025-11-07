@@ -16,7 +16,8 @@ app.get('/api/health', (req, res) => {
   res.json({
     message: 'Government Watchdog API is running',
     status: 'ok',
-    version: '1.0.0',
+    version: '1.0.1',
+    timestamp: new Date().toISOString(),
     endpoints: [
       '/api/health',
       '/api/congress/members',
