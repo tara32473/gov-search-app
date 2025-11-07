@@ -159,6 +159,7 @@ db.serialize(() => {
         state TEXT,
         chamber TEXT,
         district TEXT,
+        position TEXT,
         in_office INTEGER DEFAULT 1,
         next_election TEXT,
         phone TEXT,
@@ -166,7 +167,12 @@ db.serialize(() => {
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
     
-    // Bills and legislation
+    // Add position column if it doesn't exist (for compatibility)
+    db.run(`ALTER TABLE congress_members ADD COLUMN position TEXT`, (err) => {
+        if (err && !err.message.includes('duplicate column')) {
+            console.log('Position column already exists or other error:', err.message);
+        }
+    });
     db.run(`CREATE TABLE IF NOT EXISTS bills (
         bill_id TEXT PRIMARY KEY,
         congress INTEGER,
@@ -317,19 +323,29 @@ function auth(req, res, next) {
 // Government data fetching functions
 async function fetchCongressData() {
     try {
-        console.log('📡 Fetching congressional data...');
+        console.log('📡 Updating congressional data for 2025...');
         
-        // Comprehensive congressional data including Senate, House, and Executive
+        // Comprehensive 2025 Congressional data with current leadership
         const congressionalMembers = [
-            // Senate Leadership (2025 - Republican Majority)
-            { id: 'T000250', first: 'John', last: 'Thune', party: 'R', state: 'SD', chamber: 'senate', phone: '(202) 224-2321' }, // Majority Leader
-            { id: 'S000148', first: 'Chuck', last: 'Schumer', party: 'D', state: 'NY', chamber: 'senate', phone: '(202) 224-6542' }, // Minority Leader
-            { id: 'M000355', first: 'Mitch', last: 'McConnell', party: 'R', state: 'KY', chamber: 'senate', phone: '(202) 224-2541' }, // Senior Republican
+            // 2025 House Leadership
+            { id: 'J000299', first: 'Mike', last: 'Johnson', party: 'R', state: 'LA', chamber: 'house', district: '4', phone: '(202) 225-2777', position: 'Speaker of the House' },
+            { id: 'J000305', first: 'Hakeem', last: 'Jeffries', party: 'D', state: 'NY', chamber: 'house', district: '8', phone: '(202) 225-5936', position: 'House Minority Leader' },
+            { id: 'S001195', first: 'Steve', last: 'Scalise', party: 'R', state: 'LA', chamber: 'house', district: '1', phone: '(202) 225-3015', position: 'House Majority Leader' },
             
-            // Senate Members (All 100 Senators - 2 per state)
+            // 2025 Senate Leadership 
+            { id: 'T000250', first: 'John', last: 'Thune', party: 'R', state: 'SD', chamber: 'senate', phone: '(202) 224-2321', position: 'Senate Majority Leader' },
+            { id: 'S000148', first: 'Chuck', last: 'Schumer', party: 'D', state: 'NY', chamber: 'senate', phone: '(202) 224-6542', position: 'Senate Minority Leader' },
+            { id: 'C001056', first: 'John', last: 'Cornyn', party: 'R', state: 'TX', chamber: 'senate', phone: '(202) 224-2934', position: 'Senate Majority Whip' },
+            { id: 'D000563', first: 'Dick', last: 'Durbin', party: 'D', state: 'IL', chamber: 'senate', phone: '(202) 224-2152', position: 'Senate Minority Whip' },
+            
+            // Executive Branch (2025)
+            { id: 'POTUS47', first: 'Donald', last: 'Trump', party: 'R', state: 'FL', chamber: 'executive', position: 'President of the United States', phone: '(202) 456-1414' },
+            { id: 'VP49', first: 'J.D.', last: 'Vance', party: 'R', state: 'OH', chamber: 'executive', position: 'Vice President', phone: '(202) 456-1414' },
+            
+            // Senate (All 100 - Updated for 2025)
             
             // Alabama
-            { id: 'S000320', first: 'Richard', last: 'Shelby', party: 'R', state: 'AL', chamber: 'senate', phone: '(202) 224-5744' },
+            { id: 'B001319', first: 'Katie', last: 'Britt', party: 'R', state: 'AL', chamber: 'senate', phone: '(202) 224-5744' },
             { id: 'T000461', first: 'Tommy', last: 'Tuberville', party: 'R', state: 'AL', chamber: 'senate', phone: '(202) 224-4124' },
             
             // Alaska
@@ -337,16 +353,16 @@ async function fetchCongressData() {
             { id: 'S001198', first: 'Dan', last: 'Sullivan', party: 'R', state: 'AK', chamber: 'senate', phone: '(202) 224-3004' },
             
             // Arizona
-            { id: 'S001191', first: 'Kyrsten', last: 'Sinema', party: 'I', state: 'AZ', chamber: 'senate', phone: '(202) 224-4521' },
             { id: 'K000367', first: 'Mark', last: 'Kelly', party: 'D', state: 'AZ', chamber: 'senate', phone: '(202) 224-2235' },
+            { id: 'G000618', first: 'Ruben', last: 'Gallego', party: 'D', state: 'AZ', chamber: 'senate', phone: '(202) 224-4521' },
             
             // Arkansas
             { id: 'B001236', first: 'John', last: 'Boozman', party: 'R', state: 'AR', chamber: 'senate', phone: '(202) 224-4843' },
             { id: 'C001095', first: 'Tom', last: 'Cotton', party: 'R', state: 'AR', chamber: 'senate', phone: '(202) 224-2353' },
             
             // California
-            { id: 'F000062', first: 'Dianne', last: 'Feinstein', party: 'D', state: 'CA', chamber: 'senate', phone: '(202) 224-3841' },
             { id: 'P000145', first: 'Alex', last: 'Padilla', party: 'D', state: 'CA', chamber: 'senate', phone: '(202) 224-3553' },
+            { id: 'B001135', first: 'Laphonza', last: 'Butler', party: 'D', state: 'CA', chamber: 'senate', phone: '(202) 224-3841' },
             
             // Colorado
             { id: 'B001267', first: 'Michael', last: 'Bennet', party: 'D', state: 'CO', chamber: 'senate', phone: '(202) 224-5852' },
@@ -398,6 +414,7 @@ async function fetchCongressData() {
             
             // Louisiana
             { id: 'C001075', first: 'Bill', last: 'Cassidy', party: 'R', state: 'LA', chamber: 'senate', phone: '(202) 224-5824' },
+            { id: 'K000393', first: 'John', last: 'Kennedy', party: 'R', state: 'LA', chamber: 'senate', phone: '(202) 224-4623' },
             { id: 'K000393', first: 'John', last: 'Kennedy', party: 'R', state: 'LA', chamber: 'senate', phone: '(202) 224-4623' },
             
             // Maine
@@ -1228,10 +1245,10 @@ async function fetchCongressData() {
         
         for (const member of allMembers) {
             db.run(`INSERT OR REPLACE INTO congress_members 
-                (bioguide_id, first_name, last_name, party, state, chamber, district, phone) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                (bioguide_id, first_name, last_name, party, state, chamber, district, position, phone) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [member.id, member.first, member.last, member.party, member.state, 
-                 member.chamber, member.district || null, member.phone || null]
+                 member.chamber, member.district || null, member.position || null, member.phone || null]
             );
         }
         
