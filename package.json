@@ -1,6 +1,7 @@
 {
   "name": "gov-search-app",
-  "version": "1.0.0",
+  "version": "2025.1.0",
+  "description": "Government Search Platform - November 2025 Data Update",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
