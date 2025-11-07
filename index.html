@@ -172,8 +172,64 @@
                 <div class="search-card">
                     <h3><span class="icon">👥</span> Congress Members</h3>
                     <p>Search for representatives and senators</p>
-                    <input type="text" class="search-input" id="congress-search" placeholder="Enter name, state (e.g., CA, TX), or party...">
-                    <button class="search-btn" onclick="searchCongress()">Search Congress</button>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 0.5rem; align-items: center; margin-bottom: 1rem;">
+                        <input type="text" class="search-input" id="congress-search" placeholder="Enter name, party (Democrat, Republican)..." style="margin-bottom: 0;">
+                        <select class="search-input" id="congress-state" style="margin-bottom: 0;">
+                            <option value="">All States</option>
+                            <option value="AL">AL - Alabama</option>
+                            <option value="AK">AK - Alaska</option>
+                            <option value="AZ">AZ - Arizona</option>
+                            <option value="AR">AR - Arkansas</option>
+                            <option value="CA">CA - California</option>
+                            <option value="CO">CO - Colorado</option>
+                            <option value="CT">CT - Connecticut</option>
+                            <option value="DE">DE - Delaware</option>
+                            <option value="FL">FL - Florida</option>
+                            <option value="GA">GA - Georgia</option>
+                            <option value="HI">HI - Hawaii</option>
+                            <option value="ID">ID - Idaho</option>
+                            <option value="IL">IL - Illinois</option>
+                            <option value="IN">IN - Indiana</option>
+                            <option value="IA">IA - Iowa</option>
+                            <option value="KS">KS - Kansas</option>
+                            <option value="KY">KY - Kentucky</option>
+                            <option value="LA">LA - Louisiana</option>
+                            <option value="ME">ME - Maine</option>
+                            <option value="MD">MD - Maryland</option>
+                            <option value="MA">MA - Massachusetts</option>
+                            <option value="MI">MI - Michigan</option>
+                            <option value="MN">MN - Minnesota</option>
+                            <option value="MS">MS - Mississippi</option>
+                            <option value="MO">MO - Missouri</option>
+                            <option value="MT">MT - Montana</option>
+                            <option value="NE">NE - Nebraska</option>
+                            <option value="NV">NV - Nevada</option>
+                            <option value="NH">NH - New Hampshire</option>
+                            <option value="NJ">NJ - New Jersey</option>
+                            <option value="NM">NM - New Mexico</option>
+                            <option value="NY">NY - New York</option>
+                            <option value="NC">NC - North Carolina</option>
+                            <option value="ND">ND - North Dakota</option>
+                            <option value="OH">OH - Ohio</option>
+                            <option value="OK">OK - Oklahoma</option>
+                            <option value="OR">OR - Oregon</option>
+                            <option value="PA">PA - Pennsylvania</option>
+                            <option value="RI">RI - Rhode Island</option>
+                            <option value="SC">SC - South Carolina</option>
+                            <option value="SD">SD - South Dakota</option>
+                            <option value="TN">TN - Tennessee</option>
+                            <option value="TX">TX - Texas</option>
+                            <option value="UT">UT - Utah</option>
+                            <option value="VT">VT - Vermont</option>
+                            <option value="VA">VA - Virginia</option>
+                            <option value="WA">WA - Washington</option>
+                            <option value="WV">WV - West Virginia</option>
+                            <option value="WI">WI - Wisconsin</option>
+                            <option value="WY">WY - Wyoming</option>
+                            <option value="DC">DC - District of Columbia</option>
+                        </select>
+                        <button class="search-btn" onclick="searchCongress()" style="width: auto; padding: 0.75rem 1rem;">Search Congress</button>
+                    </div>
                     <div id="congress-results" class="results"></div>
                 </div>
 
@@ -184,56 +240,57 @@
                         <input type="text" class="search-input" id="spending-search" placeholder="Enter agency, recipient, or keyword..." style="margin-bottom: 0;">
                         <select class="search-input" id="spending-state" style="margin-bottom: 0;">
                             <option value="">All States</option>
-                            <option value="alabama">Alabama</option>
-                            <option value="alaska">Alaska</option>
-                            <option value="arizona">Arizona</option>
-                            <option value="arkansas">Arkansas</option>
-                            <option value="california">California</option>
-                            <option value="colorado">Colorado</option>
-                            <option value="connecticut">Connecticut</option>
-                            <option value="delaware">Delaware</option>
-                            <option value="florida">Florida</option>
-                            <option value="georgia">Georgia</option>
-                            <option value="hawaii">Hawaii</option>
-                            <option value="idaho">Idaho</option>
-                            <option value="illinois">Illinois</option>
-                            <option value="indiana">Indiana</option>
-                            <option value="iowa">Iowa</option>
-                            <option value="kansas">Kansas</option>
-                            <option value="kentucky">Kentucky</option>
-                            <option value="louisiana">Louisiana</option>
-                            <option value="maine">Maine</option>
-                            <option value="maryland">Maryland</option>
-                            <option value="massachusetts">Massachusetts</option>
-                            <option value="michigan">Michigan</option>
-                            <option value="minnesota">Minnesota</option>
-                            <option value="mississippi">Mississippi</option>
-                            <option value="missouri">Missouri</option>
-                            <option value="montana">Montana</option>
-                            <option value="nebraska">Nebraska</option>
-                            <option value="nevada">Nevada</option>
-                            <option value="new hampshire">New Hampshire</option>
-                            <option value="new jersey">New Jersey</option>
-                            <option value="new mexico">New Mexico</option>
-                            <option value="new york">New York</option>
-                            <option value="north carolina">North Carolina</option>
-                            <option value="north dakota">North Dakota</option>
-                            <option value="ohio">Ohio</option>
-                            <option value="oklahoma">Oklahoma</option>
-                            <option value="oregon">Oregon</option>
-                            <option value="pennsylvania">Pennsylvania</option>
-                            <option value="rhode island">Rhode Island</option>
-                            <option value="south carolina">South Carolina</option>
-                            <option value="south dakota">South Dakota</option>
-                            <option value="tennessee">Tennessee</option>
-                            <option value="texas">Texas</option>
-                            <option value="utah">Utah</option>
-                            <option value="vermont">Vermont</option>
-                            <option value="virginia">Virginia</option>
-                            <option value="washington">Washington</option>
-                            <option value="west virginia">West Virginia</option>
-                            <option value="wisconsin">Wisconsin</option>
-                            <option value="wyoming">Wyoming</option>
+                            <option value="alabama">AL - Alabama</option>
+                            <option value="alaska">AK - Alaska</option>
+                            <option value="arizona">AZ - Arizona</option>
+                            <option value="arkansas">AR - Arkansas</option>
+                            <option value="california">CA - California</option>
+                            <option value="colorado">CO - Colorado</option>
+                            <option value="connecticut">CT - Connecticut</option>
+                            <option value="delaware">DE - Delaware</option>
+                            <option value="florida">FL - Florida</option>
+                            <option value="georgia">GA - Georgia</option>
+                            <option value="hawaii">HI - Hawaii</option>
+                            <option value="idaho">ID - Idaho</option>
+                            <option value="illinois">IL - Illinois</option>
+                            <option value="indiana">IN - Indiana</option>
+                            <option value="iowa">IA - Iowa</option>
+                            <option value="kansas">KS - Kansas</option>
+                            <option value="kentucky">KY - Kentucky</option>
+                            <option value="louisiana">LA - Louisiana</option>
+                            <option value="maine">ME - Maine</option>
+                            <option value="maryland">MD - Maryland</option>
+                            <option value="massachusetts">MA - Massachusetts</option>
+                            <option value="michigan">MI - Michigan</option>
+                            <option value="minnesota">MN - Minnesota</option>
+                            <option value="mississippi">MS - Mississippi</option>
+                            <option value="missouri">MO - Missouri</option>
+                            <option value="montana">MT - Montana</option>
+                            <option value="nebraska">NE - Nebraska</option>
+                            <option value="nevada">NV - Nevada</option>
+                            <option value="new hampshire">NH - New Hampshire</option>
+                            <option value="new jersey">NJ - New Jersey</option>
+                            <option value="new mexico">NM - New Mexico</option>
+                            <option value="new york">NY - New York</option>
+                            <option value="north carolina">NC - North Carolina</option>
+                            <option value="north dakota">ND - North Dakota</option>
+                            <option value="ohio">OH - Ohio</option>
+                            <option value="oklahoma">OK - Oklahoma</option>
+                            <option value="oregon">OR - Oregon</option>
+                            <option value="pennsylvania">PA - Pennsylvania</option>
+                            <option value="rhode island">RI - Rhode Island</option>
+                            <option value="south carolina">SC - South Carolina</option>
+                            <option value="south dakota">SD - South Dakota</option>
+                            <option value="tennessee">TN - Tennessee</option>
+                            <option value="texas">TX - Texas</option>
+                            <option value="utah">UT - Utah</option>
+                            <option value="vermont">VT - Vermont</option>
+                            <option value="virginia">VA - Virginia</option>
+                            <option value="washington">WA - Washington</option>
+                            <option value="west virginia">WV - West Virginia</option>
+                            <option value="wisconsin">WI - Wisconsin</option>
+                            <option value="wyoming">WY - Wyoming</option>
+                            <option value="district of columbia">DC - District of Columbia</option>
                         </select>
                         <button class="search-btn" onclick="searchSpending()" style="width: auto; padding: 0.75rem 1rem;">Search Spending</button>
                     </div>
@@ -243,8 +300,64 @@
                 <div class="search-card">
                     <h3><span class="icon">🤝</span> Lobbying Activity</h3>
                     <p>Monitor lobbying efforts and influence</p>
-                    <input type="text" class="search-input" id="lobbying-search" placeholder="Enter client, lobbyist, or issue (e.g., healthcare)...">
-                    <button class="search-btn" onclick="searchLobbying()">Search Lobbying</button>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 0.5rem; align-items: center; margin-bottom: 1rem;">
+                        <input type="text" class="search-input" id="lobbying-search" placeholder="Enter client, lobbyist, or issue (e.g., healthcare)..." style="margin-bottom: 0;">
+                        <select class="search-input" id="lobbying-state" style="margin-bottom: 0;">
+                            <option value="">All States</option>
+                            <option value="AL">AL - Alabama</option>
+                            <option value="AK">AK - Alaska</option>
+                            <option value="AZ">AZ - Arizona</option>
+                            <option value="AR">AR - Arkansas</option>
+                            <option value="CA">CA - California</option>
+                            <option value="CO">CO - Colorado</option>
+                            <option value="CT">CT - Connecticut</option>
+                            <option value="DE">DE - Delaware</option>
+                            <option value="FL">FL - Florida</option>
+                            <option value="GA">GA - Georgia</option>
+                            <option value="HI">HI - Hawaii</option>
+                            <option value="ID">ID - Idaho</option>
+                            <option value="IL">IL - Illinois</option>
+                            <option value="IN">IN - Indiana</option>
+                            <option value="IA">IA - Iowa</option>
+                            <option value="KS">KS - Kansas</option>
+                            <option value="KY">KY - Kentucky</option>
+                            <option value="LA">LA - Louisiana</option>
+                            <option value="ME">ME - Maine</option>
+                            <option value="MD">MD - Maryland</option>
+                            <option value="MA">MA - Massachusetts</option>
+                            <option value="MI">MI - Michigan</option>
+                            <option value="MN">MN - Minnesota</option>
+                            <option value="MS">MS - Mississippi</option>
+                            <option value="MO">MO - Missouri</option>
+                            <option value="MT">MT - Montana</option>
+                            <option value="NE">NE - Nebraska</option>
+                            <option value="NV">NV - Nevada</option>
+                            <option value="NH">NH - New Hampshire</option>
+                            <option value="NJ">NJ - New Jersey</option>
+                            <option value="NM">NM - New Mexico</option>
+                            <option value="NY">NY - New York</option>
+                            <option value="NC">NC - North Carolina</option>
+                            <option value="ND">ND - North Dakota</option>
+                            <option value="OH">OH - Ohio</option>
+                            <option value="OK">OK - Oklahoma</option>
+                            <option value="OR">OR - Oregon</option>
+                            <option value="PA">PA - Pennsylvania</option>
+                            <option value="RI">RI - Rhode Island</option>
+                            <option value="SC">SC - South Carolina</option>
+                            <option value="SD">SD - South Dakota</option>
+                            <option value="TN">TN - Tennessee</option>
+                            <option value="TX">TX - Texas</option>
+                            <option value="UT">UT - Utah</option>
+                            <option value="VT">VT - Vermont</option>
+                            <option value="VA">VA - Virginia</option>
+                            <option value="WA">WA - Washington</option>
+                            <option value="WV">WV - West Virginia</option>
+                            <option value="WI">WI - Wisconsin</option>
+                            <option value="WY">WY - Wyoming</option>
+                            <option value="DC">DC - District of Columbia</option>
+                        </select>
+                        <button class="search-btn" onclick="searchLobbying()" style="width: auto; padding: 0.75rem 1rem;">Search Lobbying</button>
+                    </div>
                     <div id="lobbying-results" class="results"></div>
                 </div>
 
@@ -440,7 +553,57 @@
 
         function searchCongress() {
             const keyword = document.getElementById('congress-search').value;
-            searchAPI('/api/congress/members', 'congress-results', keyword);
+            const stateFilter = document.getElementById('congress-state') ? document.getElementById('congress-state').value : '';
+            searchCongressWithFilters(keyword, stateFilter);
+        }
+
+        async function searchCongressWithFilters(keyword = '', stateFilter = '') {
+            const resultsDiv = document.getElementById('congress-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="loading">🔍 Searching Congress...</div>';
+
+            try {
+                // Build URL with server-side filtering
+                const params = new URLSearchParams();
+                params.append('limit', '100');
+                
+                if (keyword && keyword.trim()) {
+                    params.append('keyword', keyword.trim());
+                }
+                if (stateFilter && stateFilter.trim()) {
+                    params.append('state', stateFilter.trim());
+                }
+                
+                const endpoint = `${API_BASE}/api/congress/members?${params.toString()}`;
+                const response = await fetch(endpoint);
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                let results = data.data || data;
+                if (!Array.isArray(results)) {
+                    results = [results];
+                }
+
+                if (results.length === 0) {
+                    resultsDiv.innerHTML = '<div class="result-item">No Congress members found. Try a different search or clear filters.</div>';
+                    return;
+                }
+
+                resultsDiv.innerHTML = `
+                    <div style="margin-bottom: 1rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; font-size: 0.9rem;">
+                        Found ${results.length} Congress member${results.length !== 1 ? 's' : ''}
+                        ${stateFilter ? ` from ${stateFilter}` : ''}
+                        ${keyword ? ` matching "${keyword}"` : ''}
+                    </div>
+                    ${results.slice(0, 20).map(item => formatResult(item, 'congress-results')).join('')}
+                `;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
         }
 
         function searchSpending() {
@@ -500,7 +663,57 @@
 
         function searchLobbying() {
             const keyword = document.getElementById('lobbying-search').value;
-            searchAPI('/api/lobbying', 'lobbying-results', keyword);
+            const stateFilter = document.getElementById('lobbying-state') ? document.getElementById('lobbying-state').value : '';
+            searchLobbyingWithFilters(keyword, stateFilter);
+        }
+
+        async function searchLobbyingWithFilters(keyword = '', stateFilter = '') {
+            const resultsDiv = document.getElementById('lobbying-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="loading">🔍 Searching lobbying...</div>';
+
+            try {
+                // Build URL with server-side filtering
+                const params = new URLSearchParams();
+                params.append('limit', '100');
+                
+                if (keyword && keyword.trim()) {
+                    params.append('keyword', keyword.trim());
+                }
+                if (stateFilter && stateFilter.trim()) {
+                    params.append('state', stateFilter.trim());
+                }
+                
+                const endpoint = `${API_BASE}/api/lobbying?${params.toString()}`;
+                const response = await fetch(endpoint);
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                let results = data.data || data;
+                if (!Array.isArray(results)) {
+                    results = [results];
+                }
+
+                if (results.length === 0) {
+                    resultsDiv.innerHTML = '<div class="result-item">No lobbying records found. Try a different search or clear filters.</div>';
+                    return;
+                }
+
+                resultsDiv.innerHTML = `
+                    <div style="margin-bottom: 1rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; font-size: 0.9rem;">
+                        Found ${results.length} lobbying record${results.length !== 1 ? 's' : ''}
+                        ${stateFilter ? ` related to ${stateFilter}` : ''}
+                        ${keyword ? ` matching "${keyword}"` : ''}
+                    </div>
+                    ${results.slice(0, 20).map(item => formatResult(item, 'lobbying-results')).join('')}
+                `;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
         }
 
         function searchLegislation() {
@@ -583,8 +796,42 @@
             }
         });
 
-        // Auto-trigger search when filters change
+        // Auto-trigger search when state filters change
         document.addEventListener('DOMContentLoaded', function() {
+            // Congress state filter
+            const congressState = document.getElementById('congress-state');
+            if (congressState) {
+                congressState.addEventListener('change', function() {
+                    const keyword = document.getElementById('congress-search').value;
+                    if (keyword || this.value) {
+                        searchCongress();
+                    }
+                });
+            }
+            
+            // Spending state filter  
+            const spendingState = document.getElementById('spending-state');
+            if (spendingState) {
+                spendingState.addEventListener('change', function() {
+                    const keyword = document.getElementById('spending-search').value;
+                    if (keyword || this.value) {
+                        searchSpending();
+                    }
+                });
+            }
+            
+            // Lobbying state filter
+            const lobbyingState = document.getElementById('lobbying-state');
+            if (lobbyingState) {
+                lobbyingState.addEventListener('change', function() {
+                    const keyword = document.getElementById('lobbying-search').value;
+                    if (keyword || this.value) {
+                        searchLobbying();
+                    }
+                });
+            }
+            
+            // Legislation filters
             const legislationFilter = document.getElementById('legislation-filter');
             const congressFilter = document.getElementById('congress-filter');
             

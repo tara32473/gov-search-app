@@ -3065,7 +3065,7 @@ app.post('/api/login', (req, res) => {
 
 // Congressional members search
 app.get('/api/congress/members', async (req, res) => {
-    const { state, party, chamber, search } = req.query;
+    const { state, party, chamber, search, keyword, limit = 100 } = req.query;
     let query = 'SELECT * FROM congress_members WHERE in_office = 1';
     let params = [];
     
@@ -3081,12 +3081,15 @@ app.get('/api/congress/members', async (req, res) => {
         query += ' AND chamber = ?';
         params.push(chamber.toLowerCase());
     }
-    if (search) {
-        query += ' AND (first_name LIKE ? OR last_name LIKE ?)';
-        params.push(`%${search}%`, `%${search}%`);
+    if (search || keyword) {
+        const searchTerm = search || keyword;
+        query += ' AND (first_name LIKE ? OR last_name LIKE ? OR party LIKE ? OR chamber LIKE ?)';
+        const searchPattern = `%${searchTerm}%`;
+        params.push(searchPattern, searchPattern, searchPattern, searchPattern);
     }
     
-    query += ' ORDER BY last_name, first_name';
+    query += ' ORDER BY last_name, first_name LIMIT ?';
+    params.push(parseInt(limit));
     
     db.all(query, params, (err, rows) => {
         if (err) return res.status(500).json({ error: 'Database error' });
@@ -3179,7 +3182,7 @@ app.get('/api/spending', (req, res) => {
 
 // Lobbying data
 app.get('/api/lobbying', (req, res) => {
-    const { client, lobbyist, year, min_amount, limit = 100 } = req.query;
+    const { client, lobbyist, year, min_amount, state, keyword, limit = 100 } = req.query;
     let query = 'SELECT * FROM lobbying WHERE 1=1';
     let params = [];
     
@@ -3198,6 +3201,16 @@ app.get('/api/lobbying', (req, res) => {
     if (min_amount) {
         query += ' AND amount >= ?';
         params.push(parseFloat(min_amount));
+    }
+    if (state) {
+        query += ' AND (client_name LIKE ? OR registrant_name LIKE ? OR issues LIKE ?)';
+        const statePattern = `%${state}%`;
+        params.push(statePattern, statePattern, statePattern);
+    }
+    if (keyword) {
+        query += ' AND (client_name LIKE ? OR registrant_name LIKE ? OR lobbyist_name LIKE ? OR issues LIKE ?)';
+        const keywordPattern = `%${keyword}%`;
+        params.push(keywordPattern, keywordPattern, keywordPattern, keywordPattern);
     }
     
     query += ' ORDER BY amount DESC LIMIT ?';
