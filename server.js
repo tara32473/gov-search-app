@@ -11,6 +11,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Fallback route for index.html
+app.get('/index.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({

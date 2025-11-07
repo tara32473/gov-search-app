@@ -1,0 +1,3 @@
+root: ./
+serve: index.html
+fallback: index.html
