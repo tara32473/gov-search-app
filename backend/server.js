@@ -18,55 +18,123 @@ const JWT_SECRET = process.env.JWT_SECRET || 'gov-watchdog-2025-secure-key-' + M
 // Trust proxy for rate limiting in development environments like Codespaces
 app.set('trust proxy', 1);
 
-// Security middleware
+// Enhanced security middleware
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'"],
-            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://tara32473.github.io"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://tara32473.github.io"],
             imgSrc: ["'self'", "data:", "https:"],
-            connectSrc: ["'self'"],
+            connectSrc: ["'self'", "https://gov-search-app-production.up.railway.app"],
             fontSrc: ["'self'"],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
-            frameSrc: ["'none'"]
+            frameSrc: ["'none'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"]
         }
     },
-    crossOriginEmbedderPolicy: false
+    crossOriginEmbedderPolicy: false,
+    hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true
+    }
 }));
 
-// Rate limiting for security
-const limiter = rateLimit({
+// Enhanced rate limiting for security
+const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP, please try again later.',
+    message: {
+        error: 'Too many requests from this IP, please try again later.',
+        retryAfter: '15 minutes'
+    },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) => {
+        // Skip rate limiting for health checks
+        return req.path === '/api/health';
+    }
+});
+
+const strictLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 50, // Stricter limit for data endpoints
+    message: {
+        error: 'Rate limit exceeded for data queries. Please wait before making more requests.',
+        retryAfter: '15 minutes'
+    },
+    standardHeaders: true,
+    legacyHeaders: false
 });
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // Limit auth attempts
-    message: 'Too many authentication attempts, please try again later.',
+    message: {
+        error: 'Too many authentication attempts, please try again later.',
+        retryAfter: '15 minutes'
+    },
     skipSuccessfulRequests: true
 });
 
-app.use('/api/', limiter);
+// Apply rate limiting
+app.use('/api/', generalLimiter);
+app.use('/api/congress/', strictLimiter);
+app.use('/api/spending', strictLimiter);
+app.use('/api/lobbying', strictLimiter);
+app.use('/api/legislation/', strictLimiter);
 app.use('/api/login', authLimiter);
 app.use('/api/register', authLimiter);
 
-// CORS with security settings
+// CORS with security settings - UPDATED FOR PRODUCTION
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://your-domain.com'] 
-        : ['http://localhost:3000', 'http://localhost:4000'],
+        ? ['https://tara32473.github.io', 'https://gov-search-app-production.up.railway.app'] 
+        : ['http://localhost:3000', 'http://localhost:4000', 'https://tara32473.github.io'],
     credentials: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'OPTIONS']
 }));
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '1mb' })); // Reduced from 10mb for security
 app.use(express.static('../frontend/dist'));
+
+// Input validation and sanitization functions
+function sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    return input
+        .replace(/[<>'";&\\]/g, '') // Remove potential XSS characters
+        .replace(/(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)/gi, '') // Basic SQL injection protection
+        .trim()
+        .substring(0, 100); // Limit length
+}
+
+function validateState(state) {
+    const validStates = [
+        'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
+        'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+        'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT',
+        'VA', 'WA', 'WV', 'WI', 'WY', 'DC',
+        'alabama', 'alaska', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut', 
+        'delaware', 'florida', 'georgia', 'hawaii', 'idaho', 'illinois', 'indiana', 'iowa',
+        'kansas', 'kentucky', 'louisiana', 'maine', 'maryland', 'massachusetts', 'michigan',
+        'minnesota', 'mississippi', 'missouri', 'montana', 'nebraska', 'nevada', 'new hampshire',
+        'new jersey', 'new mexico', 'new york', 'north carolina', 'north dakota', 'ohio',
+        'oklahoma', 'oregon', 'pennsylvania', 'rhode island', 'south carolina', 'south dakota',
+        'tennessee', 'texas', 'utah', 'vermont', 'virginia', 'washington', 'west virginia',
+        'wisconsin', 'wyoming', 'district of columbia'
+    ];
+    return validStates.includes(state?.toLowerCase()) ? state : '';
+}
+
+function validateLimit(limit) {
+    const numLimit = parseInt(limit);
+    return (numLimit > 0 && numLimit <= 200) ? numLimit : 50; // Cap at 200, default 50
+}
 
 // Database setup for government watchdog data
 const db = new sqlite3.Database('./watchdog.sqlite');
@@ -3063,38 +3131,52 @@ app.post('/api/login', (req, res) => {
     });
 });
 
-// Congressional members search
+// Congressional members search - SECURED
 app.get('/api/congress/members', async (req, res) => {
-    const { state, party, chamber, search, keyword, limit = 100 } = req.query;
-    let query = 'SELECT * FROM congress_members WHERE in_office = 1';
-    let params = [];
-    
-    if (state) {
-        query += ' AND state = ?';
-        params.push(state.toUpperCase());
+    try {
+        const state = validateState(req.query.state);
+        const party = sanitizeInput(req.query.party);
+        const chamber = sanitizeInput(req.query.chamber);
+        const search = sanitizeInput(req.query.search);
+        const keyword = sanitizeInput(req.query.keyword);
+        const limit = validateLimit(req.query.limit);
+        
+        let query = 'SELECT * FROM congress_members WHERE in_office = 1';
+        let params = [];
+        
+        if (state) {
+            query += ' AND state = ?';
+            params.push(state.toUpperCase());
+        }
+        if (party) {
+            query += ' AND party = ?';
+            params.push(party.toUpperCase());
+        }
+        if (chamber) {
+            query += ' AND chamber = ?';
+            params.push(chamber.toLowerCase());
+        }
+        if (search || keyword) {
+            const searchTerm = search || keyword;
+            query += ' AND (first_name LIKE ? OR last_name LIKE ? OR party LIKE ? OR chamber LIKE ?)';
+            const searchPattern = `%${searchTerm}%`;
+            params.push(searchPattern, searchPattern, searchPattern, searchPattern);
+        }
+        
+        query += ' ORDER BY last_name, first_name LIMIT ?';
+        params.push(limit);
+        
+        db.all(query, params, (err, rows) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ error: 'Database error' });
+            }
+            res.json(rows || []);
+        });
+    } catch (error) {
+        console.error('Congress API error:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-    if (party) {
-        query += ' AND party = ?';
-        params.push(party.toUpperCase());
-    }
-    if (chamber) {
-        query += ' AND chamber = ?';
-        params.push(chamber.toLowerCase());
-    }
-    if (search || keyword) {
-        const searchTerm = search || keyword;
-        query += ' AND (first_name LIKE ? OR last_name LIKE ? OR party LIKE ? OR chamber LIKE ?)';
-        const searchPattern = `%${searchTerm}%`;
-        params.push(searchPattern, searchPattern, searchPattern, searchPattern);
-    }
-    
-    query += ' ORDER BY last_name, first_name LIMIT ?';
-    params.push(parseInt(limit));
-    
-    db.all(query, params, (err, rows) => {
-        if (err) return res.status(500).json({ error: 'Database error' });
-        res.json(rows);
-    });
 });
 
 // Recent bills and legislation
